@@ -1,15 +1,26 @@
 #!/bin/bash
+# ============================================
+# sysinfo.sh - ????????
+# Day 5 Shell ???? #1
+# ??????? CPU??????????
+# ============================================
 
 echo "========== System Info =========="
 echo "Hostname: $(hostname)"
-echo "User: $(whoami)"
+echo "User:     $(whoami)"
 echo ""
+
+# CPU???? + ??
 echo "--- CPU ---"
 echo "Cores: $(nproc)"
 echo "Model: $(grep model.name /proc/cpuinfo | head -1 | cut -d: -f2 | xargs)"
 echo ""
+
+# ???free -h ??????????
 echo "--- Memory ---"
 free -h | head -2
 echo ""
+
+# ???--total ???????
 echo "--- Disk ---"
 df -h --total | grep total
