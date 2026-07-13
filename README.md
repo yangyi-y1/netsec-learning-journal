@@ -8,7 +8,7 @@
 |------|------|------|------|
 | Day 1-4 | Linux 基础命令复习 + systemd/UFW/journalctl | [day1-4-review.md](day1-4-review.md) | — |
 | Day 5 | Shell 脚本基础 + 三个实战脚本 | [day5-shell-script.md](day5-shell-script.md) | [sysinfo.sh](scripts/sysinfo.sh) / [logscan.sh](scripts/logscan.sh) / [pingscan.sh](scripts/pingscan.sh) |
-| Day 6 | OSI 模型 + TCP/IP | 待更新 | 待更新 |
+| Day 6 | OSI 模型 + TCP 三次握手 + tcpdump 抓包 | [day6-tcp-wireshark.md](day6-tcp-wireshark.md) | — |
 
 ## 环境
 
