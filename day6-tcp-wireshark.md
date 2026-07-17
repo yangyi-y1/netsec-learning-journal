@@ -105,3 +105,31 @@ echo "hi" | nc -q 0 127.0.0.1 9999
 ## 面试话术
 
 > "我理解 OSI 七层模型，由上到下是应用层(HTTP/DNS)、表示层(TLS加密)、会话层、传输层(TCP/UDP)、网络层(IP路由)、链路层(MAC)、物理层(电信号)。TCP 三次握手是 SYN→SYN+ACK→ACK，能解释每个包的 Flags 含义。用 tcpdump 在本地 loopback 上抓过包，能看到完整的握手和挥手的 Flags 变化。"
+
+---
+
+## Wireshark Windows 实操（2026-07-17 补充）
+
+### 环境要点
+
+- Wireshark Windows x64 + Npcap（安装时 3 个选项全勾：Restrict to Administrators / raw 802.11 / WinPcap 兼容模式）
+- 抓包网卡选 **WLAN**（无线上网就选它，不是"以太网"或"Loopback"）
+- LAN=局域网、WAN=广域网、WLAN=无线局域网
+
+### 从真实后台流量中识别完整握手
+
+| 包号 | 内容 | 说明 |
+|------|------|------|
+| 20-21 | DNS 查询/响应 | `self.events.data.microsoft.com`，走 **UDP 53** |
+| 22 | `SYN`（Seq=0, Win=65535） | 客户端发起连接 |
+| 23 | `SYN+ACK`（Seq=0, Ack=1） | 服务端确认并报到 |
+| 24 | `ACK`（Seq=1, Ack=1） | 握手完成 |
+| 25-32 | TLSv1.3 握手 + 加密数据 | 应用层开始干活 |
+
+### 关键收获
+
+- **先 DNS 后 TCP**：连接域名前必先解析出 IP，抓包里顺序清晰可见
+- DNS 默认走 UDP 53（短小快），响应超 512 字节才转 TCP 53
+- Wireshark 显示的 Seq/Ack 是**相对值**（真实初始序列号是 32 位随机数）
+- Win=65535 是 16 位窗口字段的默认最大值（2^16-1）
+- TCP/UDP 是"信封"，里面装的才是应用层数据（HTTP/DNS/TLS）
