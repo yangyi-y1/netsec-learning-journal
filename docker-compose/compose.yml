@@ -13,6 +13,21 @@ services:
     restart: unless-stopped
     depends_on:
       - mysql
+      - backend
+    networks:
+      - appnet
+
+  backend:
+    build: ./backend
+    container_name: flask-api
+    environment:
+      DB_HOST: mysql
+      DB_USER: root
+      DB_PASS: ${MYSQL_ROOT_PASSWORD}
+      DB_NAME: appdb
+    restart: unless-stopped
+    depends_on:
+      - mysql
     networks:
       - appnet
 
