@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import pymysql
 import os
 import platform
@@ -38,17 +38,54 @@ def stats():
     })
 
 
-@app.route("/api/visitors")
-def visitors():
+@app.route("/api/topics")
+def get_topics():
     db = get_db()
     cur = db.cursor()
-    cur.execute("CREATE TABLE IF NOT EXISTS visitors (id INT AUTO_INCREMENT PRIMARY KEY, ip VARCHAR(45), time DATETIME DEFAULT CURRENT_TIMESTAMP)")
-    cur.execute("SELECT COUNT(*) AS total FROM visitors")
-    row = cur.fetchone()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS topics (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(100) NOT NULL,
+            count INT DEFAULT 0
+        )
+    """)
+    cur.execute("SELECT id, name, count FROM topics ORDER BY id")
+    topics = cur.fetchall()
     db.close()
-    return jsonify({"total_visits": row["total"]})
+    return jsonify(topics)
+
+
+@app.route("/api/topics", methods=["POST"])
+def create_topic():
+    data = request.get_json()
+    name = data.get("name", "").strip()
+    if not name or len(name) > 100:
+        return jsonify({"error": "invalid name"}), 400
+
+    db = get_db()
+    cur = db.cursor()
+    cur.execute("INSERT INTO topics (name, count) VALUES (%s, 0)", (name,))
+    db.commit()
+    cur.execute("SELECT id, name, count FROM topics WHERE id = %s", (cur.lastrowid,))
+    topic = cur.fetchone()
+    db.close()
+    return jsonify(topic), 201
+
+
+@app.route("/api/topics/<int:topic_id>/vote", methods=["POST"])
+def vote(topic_id):
+    db = get_db()
+    cur = db.cursor()
+    cur.execute("UPDATE topics SET count = count + 1 WHERE id = %s", (topic_id,))
+    if cur.rowcount == 0:
+        db.close()
+        return jsonify({"error": "topic not found"}), 404
+    db.commit()
+    cur.execute("SELECT id, name, count FROM topics WHERE id = %s", (topic_id,))
+    topic = cur.fetchone()
+    db.close()
+    return jsonify(topic)
 
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=False)
-
