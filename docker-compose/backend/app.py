@@ -26,10 +26,15 @@ def health():
 
 @app.route("/api/stats")
 def stats():
+    try:
+        disk_info = dict(psutil.disk_usage("/")._asdict())
+    except Exception:
+        disk_info = {"error": "disk info unavailable in container"}
+
     return jsonify({
         "cpu_percent": psutil.cpu_percent(interval=1),
         "memory": dict(psutil.virtual_memory()._asdict()),
-        "disk": dict(psutil.disk_usage("/")._asdict()),
+        "disk": disk_info,
     })
 
 
