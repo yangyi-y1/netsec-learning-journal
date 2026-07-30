@@ -45,11 +45,11 @@ VBoxManage controlvm "kali-linux-2026.2-virtualbox-amd64" clipboard mode bidirec
 ### 注册步骤
 1. ctftime.org 注册账号
 2. Teams → Create new team
-   - Name: `wwqy`
+   - Name: `Hijacking`
    - Country: China
    - 非 Academic 队伍（不勾选）
    - Description: `Individual player, learning cybersecurity.`
-3. 找 jailCTF 2026 → Register → 选 wwqy → 确认
+3. 找 jailCTF 2026 → Register → 选 Hijacking → 确认
 4. 成功后会跳转到比赛平台（黑色界面）
 
 ### jailCTF 2026 信息
